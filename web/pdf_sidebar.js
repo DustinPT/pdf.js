@@ -13,6 +13,7 @@
  * limitations under the License.
  */
 
+import { FindState } from './pdf_find_controller';
 import { NullL10n } from './ui_utils';
 import { RenderingStates } from './pdf_rendering_queue';
 
@@ -23,6 +24,7 @@ const SidebarView = {
   THUMBS: 1,
   OUTLINE: 2,
   ATTACHMENTS: 3,
+  FIND_RESULT: 4,
 };
 
 /**
@@ -41,12 +43,16 @@ const SidebarView = {
  *   the outline view.
  * @property {HTMLButtonElement} attachmentsButton - The button used to show
  *   the attachments view.
+ * @property {HTMLButtonElement} findResultButton - The button used to show
+ *   the find result view.
  * @property {HTMLDivElement} thumbnailView - The container in which
  *   the thumbnails are placed.
  * @property {HTMLDivElement} outlineView - The container in which
  *   the outline is placed.
  * @property {HTMLDivElement} attachmentsView - The container in which
  *   the attachments are placed.
+ * @property {HTMLDivElement} findResultView - The container in which
+ *   the find result is placed.
  * @property {boolean} disableNotification - (optional) Disable the notification
  *   for documents containing outline/attachments. The default value is `false`.
  */
@@ -78,10 +84,13 @@ class PDFSidebar {
     this.thumbnailButton = options.thumbnailButton;
     this.outlineButton = options.outlineButton;
     this.attachmentsButton = options.attachmentsButton;
+    this.findResultButton = options.findResultButton;
+    this.findResultButton.disabled = true;
 
     this.thumbnailView = options.thumbnailView;
     this.outlineView = options.outlineView;
     this.attachmentsView = options.attachmentsView;
+    this.findResultView = options.findResultView;
 
     this.disableNotification = options.disableNotification || false;
 
@@ -99,6 +108,7 @@ class PDFSidebar {
 
     this.outlineButton.disabled = false;
     this.attachmentsButton.disabled = false;
+    this.findResultButton.disabled = true;
   }
 
   /**
@@ -165,10 +175,12 @@ class PDFSidebar {
         this.thumbnailButton.classList.add('toggled');
         this.outlineButton.classList.remove('toggled');
         this.attachmentsButton.classList.remove('toggled');
+        this.findResultButton.classList.remove('toggled');
 
         this.thumbnailView.classList.remove('hidden');
         this.outlineView.classList.add('hidden');
         this.attachmentsView.classList.add('hidden');
+        this.findResultView.classList.add('hidden');
 
         if (this.isOpen && isViewChanged) {
           this._updateThumbnailViewer();
@@ -182,10 +194,12 @@ class PDFSidebar {
         this.thumbnailButton.classList.remove('toggled');
         this.outlineButton.classList.add('toggled');
         this.attachmentsButton.classList.remove('toggled');
+        this.findResultButton.classList.remove('toggled');
 
         this.thumbnailView.classList.add('hidden');
         this.outlineView.classList.remove('hidden');
         this.attachmentsView.classList.add('hidden');
+        this.findResultView.classList.add('hidden');
         break;
       case SidebarView.ATTACHMENTS:
         if (this.attachmentsButton.disabled) {
@@ -194,10 +208,26 @@ class PDFSidebar {
         this.thumbnailButton.classList.remove('toggled');
         this.outlineButton.classList.remove('toggled');
         this.attachmentsButton.classList.add('toggled');
+        this.findResultButton.classList.remove('toggled');
 
         this.thumbnailView.classList.add('hidden');
         this.outlineView.classList.add('hidden');
         this.attachmentsView.classList.remove('hidden');
+        this.findResultView.classList.add('hidden');
+        break;
+      case SidebarView.FIND_RESULT:
+        if (this.findResultButton.disabled) {
+          return;
+        }
+        this.thumbnailButton.classList.remove('toggled');
+        this.outlineButton.classList.remove('toggled');
+        this.attachmentsButton.classList.remove('toggled');
+        this.findResultButton.classList.add('toggled');
+
+        this.thumbnailView.classList.add('hidden');
+        this.outlineView.classList.add('hidden');
+        this.attachmentsView.classList.add('hidden');
+        this.findResultView.classList.remove('hidden');
         break;
       default:
         console.error('PDFSidebar_switchView: "' + view +
@@ -402,6 +432,10 @@ class PDFSidebar {
       this.switchView(SidebarView.ATTACHMENTS);
     });
 
+    this.findResultButton.addEventListener('click', () => {
+      this.switchView(SidebarView.FIND_RESULT);
+    });
+
     // Disable/enable views.
     this.eventBus.on('outlineloaded', (evt) => {
       let outlineCount = evt.outlineCount;
@@ -449,6 +483,20 @@ class PDFSidebar {
     this.eventBus.on('presentationmodechanged', (evt) => {
       if (!evt.active && !evt.switchInProgress && this.isThumbnailViewVisible) {
         this._updateThumbnailViewer();
+      }
+    });
+
+    // 停用或启用搜索结果视图
+    this.eventBus.on('updatefindcontrolstate', (evt) => {
+      this.findResultButton.disabled = evt.state === FindState.NOT_FOUND ||
+        (evt.state === FindState.FOUND && evt.source.state.query === '');
+      if (this.active === SidebarView.FIND_RESULT &&
+        this.findResultButton.disabled) {
+        this.switchView(SidebarView.THUMBS);
+      }
+      if (this.active !== SidebarView.FIND_RESULT &&
+        !this.findResultButton.disabled) {
+        this.switchView(SidebarView.FIND_RESULT);
       }
     });
   }

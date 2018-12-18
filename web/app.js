@@ -46,6 +46,7 @@ import { PDFViewer } from './pdf_viewer';
 import { SecondaryToolbar } from './secondary_toolbar';
 import { Toolbar } from './toolbar';
 import { ViewHistory } from './view_history';
+import { PDFFindResultViewer } from './pdf_find_result_viewer';
 
 const DEFAULT_SCALE_DELTA = 1.1;
 const DISABLE_AUTO_FETCH_LOADING_BAR_TIMEOUT = 5000; // ms
@@ -106,6 +107,8 @@ let PDFViewerApplication = {
   pdfOutlineViewer: null,
   /** @type {PDFAttachmentViewer} */
   pdfAttachmentViewer: null,
+  /** @type {PDFFindResultViewer} */
+  pdfFindResultViewer: null,
   /** @type {PDFCursorTools} */
   pdfCursorTools: null,
   /** @type {ViewHistory} */
@@ -395,6 +398,11 @@ let PDFViewerApplication = {
 
     this.pdfSidebarResizer = new PDFSidebarResizer(appConfig.sidebarResizer,
                                                    eventBus, this.l10n);
+
+    this.pdfFindResultViewer = new PDFFindResultViewer({
+      container: appConfig.sidebar.findResultView,
+      eventBus,
+    });
   },
 
   run(config) {

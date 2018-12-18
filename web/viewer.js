@@ -119,10 +119,12 @@ function getViewerConfiguration() {
       thumbnailButton: document.getElementById('viewThumbnail'),
       outlineButton: document.getElementById('viewOutline'),
       attachmentsButton: document.getElementById('viewAttachments'),
+      findResultButton: document.getElementById('viewFindResult'),
       // Views
       thumbnailView: document.getElementById('thumbnailView'),
       outlineView: document.getElementById('outlineView'),
       attachmentsView: document.getElementById('attachmentsView'),
+      findResultView: document.getElementById('findResultView'),
     },
     sidebarResizer: {
       outerContainer: document.getElementById('outerContainer'),

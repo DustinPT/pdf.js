@@ -1691,6 +1691,10 @@ html[dir='rtl'] #documentPropertiesOverlay .row > * {
     content: url(images/toolbarButton-viewAttachments@2x.png);
   }
 
+  #viewFindResult.toolbarButton::before {
+    content: url(images/toolbarButton-search@2x.png);
+  }
+
   #viewFind.toolbarButton::before {
     content: url(images/toolbarButton-search@2x.png);
   }
@@ -1908,4 +1912,25 @@ html[dir='rtl'] #documentPropertiesOverlay .row > * {
   #scaleSelectContainer {
     display: none;
   }
+}
+
+#findResultView p {
+  text-decoration: none;
+  min-width: 95%;
+  min-width: calc(100% - 4px); /* Subtract the right padding (left, in RTL mode)
+                                  of the container. */
+  height: auto;
+  margin-bottom: 1px;
+  border-radius: 2px;
+  color: hsla(0,0%,100%,.8);
+  font-size: 13px;
+  line-height: 15px;
+  user-select: none;
+  white-space: normal;
+  cursor: pointer;
+}
+
+#findResultView p em{
+  color: red;
+  font-style: normal;
 }
