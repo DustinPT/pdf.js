@@ -36,6 +36,7 @@ import { PDFAttachmentViewer } from './pdf_attachment_viewer';
 import { PDFDocumentProperties } from './pdf_document_properties';
 import { PDFFindBar } from './pdf_find_bar';
 import { PDFFindController } from './pdf_find_controller';
+import { PDFFindResultViewer } from './pdf_find_result_viewer';
 import { PDFHistory } from './pdf_history';
 import { PDFLinkService } from './pdf_link_service';
 import { PDFOutlineViewer } from './pdf_outline_viewer';
@@ -46,7 +47,6 @@ import { PDFViewer } from './pdf_viewer';
 import { SecondaryToolbar } from './secondary_toolbar';
 import { Toolbar } from './toolbar';
 import { ViewHistory } from './view_history';
-import { PDFFindResultViewer } from './pdf_find_result_viewer';
 
 const DEFAULT_SCALE_DELTA = 1.1;
 const DISABLE_AUTO_FETCH_LOADING_BAR_TIMEOUT = 5000; // ms
@@ -547,6 +547,9 @@ let PDFViewerApplication = {
   setTitle(title) {
     if (this.isViewerEmbedded) {
       // Embedded PDF viewers should not be changing their parent page's title.
+      if (window.parent.onPdfViewerTitleChanged) {
+        window.parent.onPdfViewerTitleChanged(title);
+      }
       return;
     }
     document.title = title;
@@ -1061,6 +1064,10 @@ let PDFViewerApplication = {
     Promise.all([onePageRendered, animationStarted]).then(() => {
       pdfDocument.getOutline().then((outline) => {
         this.pdfOutlineViewer.render({ outline, });
+        // 如果侧边栏还没打开，则打开侧边栏并显示大纲视图
+        if (this.pdfSidebar.visibleView === SidebarView.NONE) {
+          this.pdfSidebar.switchView(SidebarView.OUTLINE, true);
+        }
       });
       pdfDocument.getAttachments().then((attachments) => {
         this.pdfAttachmentViewer.render({ attachments, });
@@ -1742,7 +1749,8 @@ function webViewerNamedAction(evt) {
 
     case 'Find':
       if (!PDFViewerApplication.supportsIntegratedFind) {
-        PDFViewerApplication.findBar.toggle();
+        PDFViewerApplication.appConfig.findBar.findField.select();
+        PDFViewerApplication.appConfig.findBar.findField.focus();
       }
       break;
   }
@@ -1954,6 +1962,7 @@ function webViewerFind(evt) {
 }
 
 function webViewerFindFromUrlHash(evt) {
+  PDFViewerApplication.findBar.findField.value = evt.query;
   PDFViewerApplication.findController.executeCommand('find', {
     query: evt.query,
     phraseSearch: evt.phraseSearch,
@@ -2115,7 +2124,8 @@ function webViewerKeyDown(evt) {
     switch (evt.keyCode) {
       case 70: // f
         if (!PDFViewerApplication.supportsIntegratedFind) {
-          PDFViewerApplication.findBar.open();
+          PDFViewerApplication.appConfig.findBar.findField.select();
+          PDFViewerApplication.appConfig.findBar.findField.focus();
           handled = true;
         }
         break;
@@ -2261,11 +2271,6 @@ function webViewerKeyDown(evt) {
       case 27: // esc key
         if (PDFViewerApplication.secondaryToolbar.isOpen) {
           PDFViewerApplication.secondaryToolbar.close();
-          handled = true;
-        }
-        if (!PDFViewerApplication.supportsIntegratedFind &&
-            PDFViewerApplication.findBar.opened) {
-          PDFViewerApplication.findBar.close();
           handled = true;
         }
         break;

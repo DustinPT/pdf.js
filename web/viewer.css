@@ -357,7 +357,7 @@ html[dir='rtl'] .findbar {
 }
 
 #findInput {
-  width: 200px;
+  width: 100px;
 }
 #findInput::-webkit-input-placeholder {
   color: hsl(0, 0%, 75%);
@@ -1840,7 +1840,7 @@ html[dir='rtl'] #documentPropertiesOverlay .row > * {
   display: none;
 }
 
-@media all and (max-width: 900px) {
+@media all and (max-width: 1155px) {
   #toolbarViewerMiddle {
     display: table;
     margin: auto;
@@ -1913,11 +1913,13 @@ html[dir='rtl'] #documentPropertiesOverlay .row > * {
     display: none;
   }
 }
-
+#findResultView{
+  padding-top: 5px;
+}
 #findResultView p {
   text-decoration: none;
-  min-width: 95%;
-  min-width: calc(100% - 4px); /* Subtract the right padding (left, in RTL mode)
+  min-width: 90%;
+  min-width: calc(100% - 20px); /* Subtract the right padding (left, in RTL mode)
                                   of the container. */
   height: auto;
   margin-bottom: 1px;
@@ -1928,9 +1930,16 @@ html[dir='rtl'] #documentPropertiesOverlay .row > * {
   user-select: none;
   white-space: normal;
   cursor: pointer;
+  margin: 0 10px 5px 10px;
+  border-bottom: 1px solid gray;
+  padding: 0 0 4px 0;
 }
 
 #findResultView p em{
   color: red;
   font-style: normal;
+}
+
+#findbarInputContainer > * {
+  float: left;
 }

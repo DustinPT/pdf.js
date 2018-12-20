@@ -37,7 +37,6 @@ const SCALE_SELECT_PADDING = 22;
  * @property {HTMLButtonElement} next - Button to go to the next page.
  * @property {HTMLButtonElement} zoomIn - Button to zoom in the pages.
  * @property {HTMLButtonElement} zoomOut - Button to zoom out the pages.
- * @property {HTMLButtonElement} viewFind - Button to open find bar.
  * @property {HTMLButtonElement} openFile - Button to open a new document.
  * @property {HTMLButtonElement} presentationModeButton - Button to switch to
  *   presentation mode.
@@ -138,9 +137,11 @@ class Toolbar {
       eventBus.dispatch('presentationmode', { source: self, });
     });
 
-    items.openFile.addEventListener('click', function() {
-      eventBus.dispatch('openfile', { source: self, });
-    });
+    if (items.openFile) {
+      items.openFile.addEventListener('click', function() {
+        eventBus.dispatch('openfile', { source: self, });
+      });
+    }
 
     items.print.addEventListener('click', function() {
       eventBus.dispatch('print', { source: self, });

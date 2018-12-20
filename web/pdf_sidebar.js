@@ -492,11 +492,15 @@ class PDFSidebar {
         (evt.state === FindState.FOUND && evt.source.state.query === '');
       if (this.active === SidebarView.FIND_RESULT &&
         this.findResultButton.disabled) {
-        this.switchView(SidebarView.THUMBS);
+        if (!this.outlineButton.disabled) {
+          this.switchView(SidebarView.OUTLINE);
+        } else {
+          this.switchView(SidebarView.THUMBS);
+        }
       }
       if (this.active !== SidebarView.FIND_RESULT &&
         !this.findResultButton.disabled) {
-        this.switchView(SidebarView.FIND_RESULT);
+        this.switchView(SidebarView.FIND_RESULT, true);
       }
     });
   }
