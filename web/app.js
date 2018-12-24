@@ -1064,10 +1064,6 @@ let PDFViewerApplication = {
     Promise.all([onePageRendered, animationStarted]).then(() => {
       pdfDocument.getOutline().then((outline) => {
         this.pdfOutlineViewer.render({ outline, });
-        // 如果侧边栏还没打开，则打开侧边栏并显示大纲视图
-        if (this.pdfSidebar.visibleView === SidebarView.NONE) {
-          this.pdfSidebar.switchView(SidebarView.OUTLINE, true);
-        }
       });
       pdfDocument.getAttachments().then((attachments) => {
         this.pdfAttachmentViewer.render({ attachments, });
@@ -1727,6 +1723,9 @@ function webViewerPageMode(evt) {
       break;
     case 'attachments':
       view = SidebarView.ATTACHMENTS;
+      break;
+    case 'find_result':
+      view = SidebarView.FIND_RESULT;
       break;
     case 'none':
       view = SidebarView.NONE;
